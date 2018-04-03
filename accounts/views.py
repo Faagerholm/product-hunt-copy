@@ -3,13 +3,24 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 
 
-def login(request):
-    return render(request, 'accounts/login.html')
-
-
-# TODO: route to homepage. fix logout
+# This is the logout function
 def logout(request):
-    return render(request, 'accounts/signup.html')
+    if request.method == 'POST':
+        auth.logout(request)
+        return redirect('home')
+
+
+# This is the login function
+def login(request):
+    if request.method == 'POST':
+        user = auth.authenticate(username=request.POST['username'], password=request.POST['password'])
+        if user is not None:
+            auth.login(request, user)
+            return redirect('home')
+        else:
+            return render(request, 'accounts/login.html', {'error': 'Username or password is incorrect.'})
+    else:
+        return render(request, 'accounts/login.html')
 
 
 def signup(request):
